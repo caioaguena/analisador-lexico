@@ -15,31 +15,43 @@ public class opRelacional {
         defMaq = "Relacional";
         switch (state) {
             case 0:
-                atm = atm + y;
+                atm = y;
                 switch (y) {
                     case "<":
                         state = 1;
-                        break;
+                        return new atomo(atm, "OP Relacional");
                     case "=":
                         state = 2;
-                        break;
+                        return new atomo(atm, "OP Relacional");
                     case ">":
                         state = 3;
-                        break;
+                        return new atomo(atm, "OP Relacional");
                 }
                 break;
             case 1:
-                break;
-            case 2:
-                break;
+                if("=".equals(y) || ">".equals(y) ){
+                    atm = atm + y;
+                    state = 4;
+                    return new atomo(atm, "OP Relacional");
+                }
+                else{
+                    return new atomo(atm, "OP Relacional");
+                }
             case 3:
-                break;
+                atm = atm + y;
+                if("=".equals(y)){
+                    state = 4;
+                    return new atomo(atm, "OP Relacional");
+                }
+                else{
+                    return new atomo(atm, "OP Relacional");
+                }
             default:
                 System.out.println("ERRO");
                 break;
         }
 
-        atm = atm + y;
+        
         return null;
     }
 }

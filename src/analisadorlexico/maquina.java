@@ -14,6 +14,7 @@ public class maquina {
     public static String defMaq = "";
 
     public static void entrada(String x) {
+        atomo auxiliar = null;
         //só pra saber q linha está
         Pattern pattern = Pattern.compile("\\s");
         Matcher matcher = pattern.matcher(x);
@@ -25,7 +26,6 @@ public class maquina {
         } else {
             count = 0;
         }
-        //----------
 
         //Numero_Inteiro
         if (Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq)) {
@@ -35,7 +35,7 @@ public class maquina {
 
         } //OP_Relacional
         else if (("<".equals(x) || ">".equals(x) || "=".equals(x)) || "Relacional".equals(defMaq)) {
-            opRelacional(x);
+            auxiliar = opRelacional(x);
         } //OP_Logico
         else if (("&".equals(x) || "$".equals(x) || "!".equals(x)) || "Logico".equals(defMaq)) {
            
@@ -49,7 +49,11 @@ public class maquina {
         else if ("/".equals(x) || "Comentario".equals(defMaq)) {
 
         }
-
+        
+        if(auxiliar != null){
+            System.out.println("Linha: "+line+" Atomo: "+auxiliar.name+" Lexeme: "+auxiliar.lexeme);
+        }
+        
     }
 
 }
