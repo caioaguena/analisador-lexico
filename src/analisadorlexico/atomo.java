@@ -8,4 +8,9 @@ package analisadorlexico;
 public class atomo {
     String name;
     String lexeme;
+    
+    public atomo(String name, String lexeme){
+        this.name = name;
+        this.lexeme = lexeme;
+    }
 }
