@@ -28,7 +28,7 @@ public class AnalisadorLexico {
         s = Character.toString(current);
         entrada(s); 
       }
-      
+      entrada(" ");
       
     } catch (IOException e) {
       e.printStackTrace();

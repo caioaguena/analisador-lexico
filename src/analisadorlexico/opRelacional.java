@@ -8,23 +8,29 @@ package analisadorlexico;
 import static analisadorlexico.maquina.atm;
 import static analisadorlexico.maquina.state;
 import static analisadorlexico.maquina.defMaq;
+import static analisadorlexico.maquina.expectedValue;
 
 public class opRelacional {
 
     public static atomo opRelacional(String y) {
-        defMaq = "Relacional";
+
         switch (state) {
             case 0:
+                defMaq = "Relacional";
                 atm = y;
                 switch (y) {
                     case "<":
                         state = 1;
+                        expectedValue.add("=");
+                        expectedValue.add(">");
                         return new atomo(atm, "OP Relacional");
                     case "=":
                         state = 2;
+                        expectedValue.clear();
                         return new atomo(atm, "OP Relacional");
                     case ">":
                         state = 3;
+                        expectedValue.add("=");
                         return new atomo(atm, "OP Relacional");
                 }
                 break;
@@ -32,18 +38,14 @@ public class opRelacional {
                 if("=".equals(y) || ">".equals(y) ){
                     atm = atm + y;
                     state = 4;
+                    expectedValue.clear();
                     return new atomo(atm, "OP Relacional");
                 }
-                else{
-                    return new atomo(atm, "OP Relacional");
-                }
-            case 3:
-                atm = atm + y;
+            case 3:           
                 if("=".equals(y)){
+                    atm = atm + y;
                     state = 4;
-                    return new atomo(atm, "OP Relacional");
-                }
-                else{
+                    expectedValue.clear();
                     return new atomo(atm, "OP Relacional");
                 }
             default:
