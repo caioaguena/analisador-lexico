@@ -4,6 +4,7 @@ import static analisadorlexico.AnalisadorLexico.count;
 import static analisadorlexico.AnalisadorLexico.line;
 import static analisadorlexico.Comentario.Comentario;
 import static analisadorlexico.Frase.Frase;
+import static analisadorlexico.opExponencial.opExponencial;
 import static analisadorlexico.Identificador.Identificador;
 import static analisadorlexico.NumeroInteiro.NumeroInteiro;
 import static analisadorlexico.opFracao.opFracao;
@@ -57,7 +58,12 @@ public class maquina {
             System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
             reset();
             atm = x;
+        } else if (("Exponencial".equals(defMaq)) && (state == 2) && !Character.isDigit(x.charAt(0))) {
+            System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
+            reset();
+            atm = x;
         }
+        
         //     System.out.println(x);
             System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm); 
         //Numero_Inteiro
@@ -81,6 +87,9 @@ public class maquina {
         } //Comentario
         else if ("/".equals(x) || "Comentario".equals(defMaq)) {
             auxiliar = Comentario(x);
+        } //Exponencial
+        else if ("e".equals(x) || "E".equals(x) || "Comentario".equals(defMaq)) {
+            auxiliar = opExponencial(x);
         }
 
     }
