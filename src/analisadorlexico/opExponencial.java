@@ -24,7 +24,7 @@ public class opExponencial {
                 return new atomo(atm, "Exponencial");
             case 1:
                 atm = atm +y;
-                if(!"+".equals(y) || !"+".equals(y)){
+                if(!"+".equals(y) || !"-".equals(y)){
                      System.out.print("ERROe");
                     System.exit(1);
                 }else

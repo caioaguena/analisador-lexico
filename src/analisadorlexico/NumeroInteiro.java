@@ -16,7 +16,7 @@ public class NumeroInteiro {
                 atm = atm+y;
                 state = 1;
                 if(!"+".equals(y) && !Character.isDigit(y.charAt(0)) ){
-                   System.out.print("ERRO ");
+                   System.out.print("ERRO ni");
                    System.exit(1);
                     return null;
                 }    else if("+".equals(y)){

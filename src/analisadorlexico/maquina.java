@@ -1,5 +1,8 @@
 package analisadorlexico;
 
+import static analisadorlexico.maquina.atm;
+import static analisadorlexico.maquina.defMaq;
+import static analisadorlexico.maquina.state;
 import static analisadorlexico.AnalisadorLexico.count;
 import static analisadorlexico.AnalisadorLexico.line;
 import static analisadorlexico.Comentario.Comentario;
@@ -25,7 +28,7 @@ public class maquina {
 
     public static void entrada(String x) {
         // System.out.println(x);
-        // System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
+         //System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
         //só pra saber q linha está
         Pattern pattern = Pattern.compile("\\s");
         Matcher matcher = pattern.matcher(x);
@@ -42,10 +45,17 @@ public class maquina {
             System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
             reset();
             atm = x;
-        } else if ("Identificador".equals(defMaq) && (!Character.isDigit(x.charAt(0)) && !Character.isLetter(x.charAt(0)))) {
-            System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
-            reset();
-            atm = x;
+        } else if (("Identificador".equals(defMaq)) && (!Character.isDigit(x.charAt(0)) && !Character.isLetter(x.charAt(0))) && (!"Exponencial".equals(defMaq))) {
+            if ("+".equals(x) || "-".equals(x)) {
+                defMaq = "Exponencial";
+                state = 2;
+                auxiliar = new atomo(atm, "Exponencial");
+            } else {
+                System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
+                reset();
+                atm = x;
+            }
+
         } else if (("Inteiro".equals(defMaq) || "Fracao".equals(defMaq)) && (state == 2)) {
             System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
             reset();
@@ -64,14 +74,15 @@ public class maquina {
             reset();
             atm = x;
         }
-        
+
         //     System.out.println(x);
-         //   System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm); 
+        //   System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm); 
         //Numero_Inteiro
-        if ((Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq)) {
+        if ((Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq) && !"Exponencial".equals(defMaq)) {
+           System.out.print("já errou");
             auxiliar = NumeroInteiro(x);
         } //Identificador
-        else if ((Character.isLetter(x.charAt(0)) || "Identificador".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq)) {
+        else if ((Character.isLetter(x.charAt(0)) || ("Identificador".equals(defMaq) && !"Exponencial".equals(defMaq)) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq)) {
             auxiliar = Identificador(x);
         } //OP_Relacional
         else if (("<".equals(x) || ">".equals(x) || "=".equals(x)) || "Relacional".equals(defMaq)) {
@@ -89,7 +100,8 @@ public class maquina {
         else if ("/".equals(x) || "Comentario".equals(defMaq)) {
             auxiliar = Comentario(x);
         } //Exponencial
-        else if ("e".equals(x) || "E".equals(x) || "Comentario".equals(defMaq)) {
+        else if ("e".equals(x) || "E".equals(x) || "Exponencial".equals(defMaq)) {
+        
             auxiliar = opExponencial(x);
         }
 

@@ -7,8 +7,7 @@ import static analisadorlexico.maquina.state;
 public class Identificador {
 
     public static atomo Identificador(String y) {
-  
-        switch (state) {
+        switch (state) {       
             case 0:
                 defMaq = "Identificador";
                 atm = y;
