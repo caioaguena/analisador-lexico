@@ -15,13 +15,13 @@ public class Comentario {
                 return new atomo(atm, "Comentario");
             case 1:
                 atm = atm + y;
-                 state = 2;
                 if (!"*".equals(y)) {
                     System.out.print("ERROx");
                     System.exit(1);
                     return new atomo(atm, "Comentario");
                 } else {
                     state = 2;
+                    return new atomo(atm, "Comentario");
                 }
             case 2:
                 atm = atm + y;

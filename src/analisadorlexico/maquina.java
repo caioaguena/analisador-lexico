@@ -25,6 +25,7 @@ public class maquina {
 
     public static void entrada(String x) {
         // System.out.println(x);
+        // System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
         //só pra saber q linha está
         Pattern pattern = Pattern.compile("\\s");
         Matcher matcher = pattern.matcher(x);
@@ -65,7 +66,7 @@ public class maquina {
         }
         
         //     System.out.println(x);
-            System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm); 
+         //   System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm); 
         //Numero_Inteiro
         if ((Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq)) {
             auxiliar = NumeroInteiro(x);
