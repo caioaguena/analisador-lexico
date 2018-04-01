@@ -17,12 +17,12 @@ public class opFracao {
                 
                 atm = atm+y;
                 state = 1;
-                if(!"*".equals(y) && !Character.isDigit(y.charAt(0)) ){
+                if(!".".equals(y) && !Character.isDigit(y.charAt(0)) ){
                     System.out.print("ERRO1 ");
                    System.exit(1);
                     return null;
                 } 
-                if("*".equals(y)){
+                if(".".equals(y)){
                     state = 2;
                 }
                 return new atomo(atm, "Fracao");
