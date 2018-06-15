@@ -53,11 +53,14 @@ public class maquina {
         else{
             atriboff = x;
         }
-      //  System.out.println(" "+atriboff+" maq:"+defMaq);
+        //System.out.println(" "+atriboff+" maq:"+defMaq);
     
         
         if (!expectedValue.contains(x) && (!"".equals(defMaq) && !"Identificador".equals(defMaq) && !"Inteiro".equals(defMaq) && !"Fracao".equals(defMaq) && !"Frase".equals(defMaq) && !"Exponencial".equals(defMaq) && !"Comentario".equals(defMaq))) {
-            reset(x);
+            if("<-".equals(atm+x)){
+                auxiliar = new atomo("atribuição" ,"Atomo sem atributo");
+            }
+            reset(x);           
         } else if (("Identificador".equals(defMaq)) && (!Character.isDigit(x.charAt(0)) && !Character.isLetter(x.charAt(0))) && (!"Exponencial".equals(defMaq))) {
             if (("+".equals(x) || "-".equals(x)) && (auxiliar.name.charAt(0) == 'e' || auxiliar.name.charAt(0) == 'E')) {
                 defMaq = "Exponencial";
@@ -92,7 +95,7 @@ public class maquina {
        
        
         //Numero_Inteiro
-        if ((Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq) && !"Exponencial".equals(defMaq)) {
+        if ((Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq) && !"Exponencial".equals(defMaq) && !"Identificador".equals(defMaq)) {
             auxiliar = NumeroInteiro(x);
         } //Identificador
         else if ((Character.isLetter(x.charAt(0)) || ("Identificador".equals(defMaq) && !"Exponencial".equals(defMaq)) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq)) {
@@ -114,6 +117,7 @@ public class maquina {
             auxiliar = Comentario(x);
         } //Exponencial
         else if ("e".equals(x) || "E".equals(x) || "Exponencial".equals(defMaq)) {
+            System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
             auxiliar = opExponencial(x);
         }
         
@@ -126,6 +130,7 @@ public class maquina {
         expectedValue.clear();
         auxiliar = null;
         atm = x;
+        atriboff = "";
     }
 
     public static void listaReservada() {
