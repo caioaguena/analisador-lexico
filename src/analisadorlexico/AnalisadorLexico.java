@@ -12,14 +12,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Scanner;
 
 
 public class AnalisadorLexico {
     public static int count = 0;
-    public static int line = 1;
+    public static int line = 1; 
     public static void main(String[] args) throws FileNotFoundException, IOException {
-    listaReservada();
+     LinkedList<String> tokens = new LinkedList<>();
+        
+        listaReservada();
     initAtomoSemAtributo();
     String s;
     char current;
@@ -38,6 +41,12 @@ public class AnalisadorLexico {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
+    //analisador sintatico
+    while(!tokens.isEmpty()){
+       
+    }
+    
     }
 
 }
