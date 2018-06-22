@@ -6,6 +6,9 @@ import static analisadorlexico.maquina.atomoSemAtributo;
 import static analisadorlexico.maquina.entrada;
 import static analisadorlexico.maquina.initAtomoSemAtributo;
 import static analisadorlexico.maquina.listaReservada;
+import analisadorlexico.AnalisadorSintatico;
+import static analisadorlexico.AnalisadorSintatico.operadoresADD;
+import static analisadorlexico.AnalisadorSintatico.tiposADD;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,15 +22,17 @@ import java.util.Scanner;
 public class AnalisadorLexico {
     public static int count = 0;
     public static int line = 1; 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-     LinkedList<String> tokens = new LinkedList<>();
-        
+    public static String consumed = ""; 
+    public static LinkedList<String> tokens = new LinkedList<>();
+    public static void main(String[] args) throws FileNotFoundException, IOException {      
         listaReservada();
+        tiposADD();
+        operadoresADD();
     initAtomoSemAtributo();
     String s;
     char current;
     
-      File file = new File("teste.txt");
+      File file = new File("ex01.txt");
     try {
       FileInputStream fis = new FileInputStream(file);
 
@@ -36,7 +41,7 @@ public class AnalisadorLexico {
         s = Character.toString(current);
         entrada(s); 
       }
-      entrada(" ");
+      System.out.println(tokens);
       
     } catch (IOException e) {
       e.printStackTrace();
@@ -44,6 +49,10 @@ public class AnalisadorLexico {
     
     //analisador sintatico
     while(!tokens.isEmpty()){
+        if(!AnalisadorSintatico.consumir(tokens.pollFirst())){
+            System.out.println("Programa encontrou token não esperado");
+            tokens.clear();
+        }
        
     }
     

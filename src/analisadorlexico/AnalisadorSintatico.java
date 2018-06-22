@@ -5,6 +5,8 @@
  */
 package analisadorlexico;
 
+import static analisadorlexico.AnalisadorLexico.tokens;
+import static analisadorlexico.AnalisadorLexico.consumed;
 import java.util.ArrayList;
 
 /**
@@ -12,140 +14,276 @@ import java.util.ArrayList;
  * @author wch4k
  */
 public class AnalisadorSintatico {
+
     static Boolean started = false;
     static Boolean endline = false;
     static String maqAtual = "";
     static int state = 0;
-    static ArrayList<String> expectedToken = new ArrayList<String>();
-    
-    public Boolean consumir(String x){
-        
-        if(started = false){
+    static Boolean cAttrib = true;
+    static ArrayList<String> previousMachine = new ArrayList<String>();
+    public static ArrayList<String> tipos = new ArrayList<String>();
+    public static ArrayList<String> operadores = new ArrayList<String>();
+
+    public static Boolean consumir(String x) {
+        consumed = x;
+        //System.out.println("consumindo: " + x);
+        if (started == false) {
             return bloco(x);
         }
-        
+
         maqAtual = defMaq(x);
-        attET(x);
-        if(expectedToken.contains(x)){
-          
-            return true;
-        }else{
-            return false;
-        }
-        
+        //System.out.println("Maquina atual: "+maqAtual);
+        return attET(x);
+        // return expectedToken.contains(x);
+
     }
-    
-    private String defMaq(String maq){
-        if (state == 0 || endline == true){
-            switch(maq){
-                case "inicio": return "outra parte"; 
-                case "variaveis": state = 1;return "declaracao_de_variaveis";
-                case "funcao":return "declaracao_de_funcao";
-                case "procedimento":return "declaracao_de_procedimento";
-                default: return maqAtual;
+
+    public static String defMaq(String maq) {
+        if (state == 0 || endline == true) {
+            switch (maq) {
+                case "INICIO":
+                    return "outra parte";
+                case "VARIAVEIS":
+                    return "declaracao_de_variaveis";
+                case "FUNCAO":
+                    return "declaracao_de_funcao";
+                case "PROCEDIMENTO":
+                    return "declaracao_de_procedimento";
+                case "Comando":
+                    return "Comando";
+                case "cAtribuicao":
+                    return "cAtribuicao";
+                default:
+                    return maqAtual;
             }
         }
         return maqAtual;
     }
-    
-    private void attET(String x){
-        switch(maqAtual){
-            case "declaracao_de_variaveis":ddv(x);
-            case "declaracao_de_funcao":ddf(x);
-            case "declaracao_de_procedimento":ddp(x);
-            case "parametros_formais": pf(x);
-            case "outra parte":
-            default:break;
-        }
-    }
-    
-    private Boolean bloco(String y){
-        if("algoritmo".equals(y) && state == 0){
-            state = 1;
-            return true;
-        }
-        else if("IDENTIFICADOR".equals(y) && state == 1){
-            started = true;
-            state = 0;
-            expectedToken.add("inicio");
-            expectedToken.add("variaveis");
-            expectedToken.add("funcao");
-            expectedToken.add("procedimento");
-            return true;
-        }
-        else{return false;}
-    }
-    
-    //declaração de variavel
-    private void ddv(String x){
-        expectedToken.clear();
-        switch(state){
-            case 1: state = 2;
-            expectedToken.add("IDENTIFICADOR");
-            case 2:
-                if(x.equals("VETOR")){
-                    state = 5;
-                    expectedToken.add("VETOR");
-                }else{
-             state = 3;
-            expectedToken.add("NUMERO_REAL");
-            expectedToken.add("NUMERO_INTEIRO");
-            expectedToken.add("LETRA");
-                }
-            case 3: state = 4;
-            endline = true;
-             expectedToken.add(";");
-            case 5: state = 6;
-            expectedToken.add("[");
-            case 6: state = 7;
-            expectedToken.add("NUMERO_REAL");
-            expectedToken.add("NUMERO_INTEIRO");
-            case 7: state = 8;
-            expectedToken.add("..");
-            case 8: state = 9;
-            expectedToken.add("NUMERO_REAL");
-            expectedToken.add("NUMERO_INTEIRO");
-            case 9: state = 10;
-            expectedToken.add("]");
-            case 10: state = 11;
-            expectedToken.add("de");
-            case 11: state = 3;
-            expectedToken.add("INTEIRO");
-            expectedToken.add("REAL");
-            expectedToken.add("CARACTERE");
-            expectedToken.add("LOGICO");
-            case 4:state = 2;
-            expectedToken.add("IDENTIFICADOR");
-            default: System.out.print("erro ddv");
-        }
-    }
-    
-    //declaração de função
-    private void ddf(String x){
-        expectedToken.clear();
-        switch(state){
-            case 0: state = 1;    
-                expectedToken.add("funcao");
-            case 1: state = 2;
-                 expectedToken.add("IDENTIFICADOR");
-            case 2:
-                if(x.equals("(")){
-                    state = 0;
-                    maqAtual = "parametros_formais";
-                }
-                 expectedToken.add("(");
-            case 3:
+
+    public static Boolean attET(String x) {
+        // System.out.print("chego aqui ta certo");
+        switch (maqAtual) {
+            case "declaracao_de_variaveis":
+                return ddv();
+            case "declaracao_de_funcao":
+                return ddf();
+            //case "declaracao_de_procedimento":ddp(x);
+            case "parametros_formais":
+                return pf();
+            case "Comando":
+                return C();
+            case "cAtribuicao":
+                return cAtribuicao();
             default:
+                break;
+        }
+        return false;
+    }
+
+    public static Boolean bloco(String y) {
+        if ("ALGORITMO".equals(y) && "Identificador".equals(AnalisadorLexico.tokens.get(0))) {
+            AnalisadorLexico.tokens.remove(0);
+            started = true;
+            return true;
+        } else {
+            System.out.print("Ja comecou errado o programa");
+            return false;
         }
     }
-    
-    //declaração de procedimento
-    private void ddp(String x){
-        
+
+    public static Boolean cAtribuicao(){
+        if(cAttrib){
+          if(operadores.contains(consumed)){
+            System.out.print(consumed+" ");
+            return true;
+          }
+        }else{
+           if(tipos.contains(consumed)){
+            System.out.print(consumed+" ");
+            return true;
+          }
+           if(";".equals(consumed)){
+               System.out.println("cabo");
+           }
+        }
+        return true;
     }
     
-    //parametros formais
-    private void pf(String x){
+    //Comando
+    public static Boolean C(){
+ 
+         //atribuição
+        if(("Identificador".equals(consumed) && "Atribuição".equals(tokens.get(0)))){        
+            tokens.remove(0);
+            maqAtual = "cAtribuicao";
+            return true;
+        }
         
+        //condicional
+        if("SE".equals(consumed)){
+           
+        }
+        
+        return true;
+    }
+    
+    //declaracao_de_funcao
+    public static Boolean ddf() {
+        if (state == 0) {
+            if ("Identificador".equals(tokens.get(0)) && "Abre_Par".equals(tokens.get(1))) {
+                System.out.println("Funcao " + tokens.get(0));
+                tokens.remove(0);
+                previousMachine.add("declaracao_de_funcao");
+                state = 1;
+                maqAtual = "parametros_formais";
+                return true;
+            } else {
+                System.out.println("Esperava um Identificador e um ( - Foi encontrado " + tokens.get(0));
+                return false;
+            }
+        }
+
+        if (state == 1) {
+            //System.out.println("estado 1 chegou");
+            if("Dois_Pontos".equals(tokens.get(0)) && tipos.contains(tokens.get(1)) && "VARIAVEIS".equals(tokens.get(2)) ){
+                tokens.remove(0);
+                tokens.remove(0);
+                 previousMachine.add("declaracao_de_funcao");
+                state = 2;
+                maqAtual = "declaracao_de_variaveis";
+                return true;
+            }else {
+                System.out.println("Esperava Dois_Pontos e um tipo_simples, foi encontrado " + tokens.get(0));
+                return false;
+            }
+            
+        }
+        
+        if(state == 2){
+            if("INICIO".equals(consumed)){
+                previousMachine.add("declaracao_de_funcao");
+                state = 3;
+                maqAtual = "Comando";
+           //     tokens.offerFirst("INICIO");
+            }
+             return true;
+        }
+
+        return true;
+    }
+
+    //parametros_formais
+    public static Boolean pf() {
+        if (("REF".equals(tokens.get(0)) && "Identificador".equals(tokens.get(1)) && tipos.contains(tokens.get(2)))) {
+            System.out.println("pf: "+tokens.get(0)+" "+tokens.get(1)+" "+tokens.get(2));
+            for (int i = 0; i < 3; i++) {
+                tokens.remove(0);
+            }
+            if ("Fecha_Par".equals(tokens.get(0))) {
+                maqAtual = previousMachine.get(previousMachine.size() - 1);
+                previousMachine.remove(previousMachine.size() - 1);
+                return true;
+            }
+            if (!"Ponto_Virgula".equals(tokens.get(0))) {
+                System.out.println("Erro na passagem de parametros formais - Faltando um ponto e virgula");
+                return false;
+            }
+            return true;
+        } else if (("Identificador".equals(tokens.get(0)) && tipos.contains(tokens.get(1)))) {
+            System.out.println("pf: "+tokens.get(0)+" "+tokens.get(1));
+            for (int i = 0; i < 2; i++) {
+                tokens.remove(0);
+            }
+            if ("Fecha_Par".equals(tokens.get(0))) {
+                maqAtual = previousMachine.get(previousMachine.size() - 1);
+                previousMachine.remove(previousMachine.size() - 1);
+                return true;
+            }
+            if (!"Ponto_Virgula".equals(tokens.get(0))) {
+                System.out.println("Erro na passagem de parametros formais - Faltando um ponto e virgula");
+                return false;
+            }
+            return true;
+        } else {
+            System.out.println("Erro na passagem de parametros formais");
+            return false;
+        }
+
+    }
+
+    //declaracao_de_variaveis
+    public static Boolean ddv() {
+        if ("Identificador".equals(tokens.get(0))) {
+            System.out.print(tokens.get(0) + " ");
+            tokens.remove(0);
+            if (tipos.contains(tokens.get(0))) {
+                System.out.print(tokens.get(0) + " \n");
+
+                if ("VETOR".equals(tokens.get(0))) {
+                    tokens.remove(0);
+                    if ("Abre_chave".equals(tokens.get(0)) && tipos.contains(tokens.get(1))
+                            && "Ponto".equals(tokens.get(2)) && "Ponto".equals(tokens.get(3)) && tipos.contains(tokens.get(4))
+                            && "Fecha_chave".equals(tokens.get(5)) && "DE".equals(tokens.get(6)) && tipos.contains(tokens.get(7))
+                            && "Ponto_Virgula".equals(tokens.get(8))) {
+                        for (int i = 0; i < 9; i++) {
+                            tokens.remove(0);
+                        }
+                        if (!"Identificador".equals(tokens.get(0))) {
+                            if(!previousMachine.isEmpty()){
+                                maqAtual = previousMachine.get(previousMachine.size() - 1);
+                            }else{
+                                maqAtual = "";
+                            }                   
+                        } else {
+                            tokens.offerFirst("Identificador");
+                        }
+                        return true;
+                    } else {
+                        System.out.println("Erro na sintaxe do vetor");
+                        return false;
+                    }
+
+                } else {
+                    tokens.remove(0);
+                    if ("Ponto_Virgula".equals(tokens.get(0))) {
+                        tokens.remove(0);
+                        if (!"Identificador".equals(tokens.get(0))) {
+                             if(!previousMachine.isEmpty()){
+                                maqAtual = previousMachine.get(previousMachine.size() - 1);
+                            }else{
+                                maqAtual = "";
+                            } 
+                        } else {
+                            tokens.offerFirst("Identificador");
+                        }
+                        return true;
+                    } else {
+                        System.out.println("Esperava um Ponto_virgula - Foi encontrado " + tokens.get(0));
+                        return false;
+                    }
+                }
+
+            } else {
+                System.out.println("Esperava um Tipo - Foi encontrado " + tokens.get(0));
+            }
+        } else {
+            System.out.println("Esperava IDENTIFICADOR - Foi encontrado " + tokens.get(0));
+            return false;
+        }
+        return true;
+    }
+
+    public static void tiposADD() {
+        tipos.add("INTEIRO");
+        tipos.add("REAL");
+        tipos.add("FRASE");
+        tipos.add("VETOR");
+        tipos.add("Numero_Inteiro");
+    }
+
+    public static void operadoresADD(){
+        operadores.add("Adicao");
+        operadores.add("Subtracao");
+        operadores.add("Multiplicacao");
     }
 }

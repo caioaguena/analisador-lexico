@@ -21,46 +21,46 @@ import java.util.regex.Pattern;
 
 public class maquina {
 
-    public static String atm="";
+    public static String atm = "";
     public static int state = 0;
     public static String aux = "";
     public static String atriboff = "";
     public static String defMaq = "";
+    public static Boolean enter = true;
+    public static Boolean enter2 = false;
     public static atomo auxiliar = null;
     public static ArrayList<String> expectedValue = new ArrayList<String>();
     public static ArrayList<String> pReservadas = new ArrayList<String>();
-    public static Map<String,String> atomoSemAtributo = new HashMap<String,String>();
-    
+    public static Map<String, String> atomoSemAtributo = new HashMap<String, String>();
+
     public static void entrada(String x) {
         // System.out.println(x);
         //System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
         //só pra saber q linha está
         lineCounter(x);
-        
-        if(pReservadas.contains(atm.toUpperCase())){
-        System.out.println("Linha: " + line + " Atomo: " + atm.toUpperCase() + " Lexeme: Palavra reservada");
-        state = 0;
-        defMaq = "";
-        expectedValue.clear();
-        auxiliar = null;
-        atm = "";
-        } 
-        
-        
-        if("<".equals(atriboff)){
-        atriboff = atriboff + x;
+
+        if (pReservadas.contains(atm.toUpperCase())) {
+            System.out.println("Linha: " + line + " Atomo: " + atm.toUpperCase() + " Lexeme: Palavra reservada");
+            AnalisadorLexico.tokens.add(atm.toUpperCase());
+            state = 0;
+            defMaq = "";
+            expectedValue.clear();
+            auxiliar = null;
+            atm = "";
         }
-        else{
+
+        if (":".equals(atriboff)) {
+            atriboff = atriboff + x;
+        } else {
             atriboff = x;
         }
         //System.out.println(" "+atriboff+" maq:"+defMaq);
-    
-        
+
         if (!expectedValue.contains(x) && (!"".equals(defMaq) && !"Identificador".equals(defMaq) && !"Inteiro".equals(defMaq) && !"Fracao".equals(defMaq) && !"Frase".equals(defMaq) && !"Exponencial".equals(defMaq) && !"Comentario".equals(defMaq))) {
-            if("<-".equals(atm+x)){
-                auxiliar = new atomo("atribuição" ,"Atomo sem atributo");
+            if (":=".equals(atm + x)) {
+                auxiliar = new atomo("atribuição", "Atomo sem atributo");
             }
-            reset(x);           
+            reset(x);
         } else if (("Identificador".equals(defMaq)) && (!Character.isDigit(x.charAt(0)) && !Character.isLetter(x.charAt(0))) && (!"Exponencial".equals(defMaq))) {
             if (("+".equals(x) || "-".equals(x)) && (auxiliar.name.charAt(0) == 'e' || auxiliar.name.charAt(0) == 'E')) {
                 defMaq = "Exponencial";
@@ -82,18 +82,22 @@ public class maquina {
         } else if (("Exponencial".equals(defMaq)) && (state == 2) && !Character.isDigit(x.charAt(0))) {
             reset(x);
         }
-       
-       //System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
-         if((atomoSemAtributo.get(atriboff) != null)  &&  "".equals(defMaq)){    
-        System.out.println("Linha: " + line + " Atomo: " + atomoSemAtributo.get(atriboff) + " Lexeme: Atomo sem atributo");
-        state = 0;
-        defMaq = "";
-        expectedValue.clear();
-        auxiliar = null;
-        atm = "";
+
+        //System.out.println("lendo esse agr: "+x+" cond: "+atomoSemAtributo.get(atriboff)+" maq: "+defMaq);
+        // System.out.println("lendo esse agr: "+atriboff);
+        //System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x);    
+        if (((atomoSemAtributo.get(atriboff) != null) && "".equals(defMaq))) {
+
+            System.out.println("Linha: " + line + " Atomo: " + atomoSemAtributo.get(atriboff) + " Lexeme: Atomo sem atributo");
+            AnalisadorLexico.tokens.add(atomoSemAtributo.get(atriboff));
+            state = 0;
+            defMaq = "";
+            expectedValue.clear();
+            auxiliar = null;
+            atm = "";
+            enter = false;
         }
-       
-       
+
         //Numero_Inteiro
         if ((Character.isDigit(x.charAt(0)) || "Inteiro".equals(defMaq) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq) && !"Exponencial".equals(defMaq) && !"Identificador".equals(defMaq)) {
             auxiliar = NumeroInteiro(x);
@@ -101,7 +105,8 @@ public class maquina {
         else if ((Character.isLetter(x.charAt(0)) || ("Identificador".equals(defMaq) && !"Exponencial".equals(defMaq)) || (state == 1 && Character.isDigit(x.charAt(0)))) && !"Frase".equals(defMaq) && !"Comentario".equals(defMaq)) {
             auxiliar = Identificador(x);
         } //OP_Relacional
-        else if (("<".equals(x) || ">".equals(x) || "=".equals(x)) || "Relacional".equals(defMaq)) {
+        else if (("<".equals(x) || ">".equals(x) || ("=".equals(x) && enter)) || "Relacional".equals(defMaq)) {
+            //    System.out.println("encrenca "+ enter);
             auxiliar = opRelacional(x);
         } //OP_Logico
         else if (("&".equals(x) || "$".equals(x) || "!".equals(x)) || "Logico".equals(defMaq)) {
@@ -117,24 +122,28 @@ public class maquina {
             auxiliar = Comentario(x);
         } //Exponencial
         else if ("e".equals(x) || "E".equals(x) || "Exponencial".equals(defMaq)) {
-            System.out.println("Maquina: " + defMaq + " Estado: " + state +" atomo: " + atm + " X:"+x); 
+            System.out.println("Maquina: " + defMaq + " Estado: " + state + " atomo: " + atm + " X:" + x);
             auxiliar = opExponencial(x);
         }
-        
+        enter = true;
     }
 
     public static void reset(String x) {
         System.out.println("Linha: " + line + " Atomo: " + auxiliar.name + " Lexeme: " + auxiliar.lexeme);
+        AnalisadorLexico.tokens.add(auxiliar.lexeme);
         state = 0;
         defMaq = "";
         expectedValue.clear();
         auxiliar = null;
         atm = x;
-        atriboff = "";
+        //  atriboff = "";
     }
 
     public static void listaReservada() {
         pReservadas.add("ALGORITMO");
+        pReservadas.add("VETOR");
+        pReservadas.add("DE");
+        pReservadas.add("REF");
         pReservadas.add("ATE");
         pReservadas.add("CADEIA");
         pReservadas.add("CARACTER");
@@ -156,7 +165,7 @@ public class maquina {
     }
 
     public static void lineCounter(String x) {
-         Pattern pattern = Pattern.compile("\\s");
+        Pattern pattern = Pattern.compile("\\s");
         Matcher matcher = pattern.matcher(x);
         if (matcher.find()) {
             count += 1;
@@ -167,14 +176,18 @@ public class maquina {
             count = 0;
         }
     }
-    
+
     public static void initAtomoSemAtributo() {
-        atomoSemAtributo.put("<-", "Atribuição");
+        atomoSemAtributo.put(":=", "Atribuição");
+        atomoSemAtributo.put("[", "Abre_chave");
+        atomoSemAtributo.put("]", "Fecha_chave");
         atomoSemAtributo.put(".", "Ponto");
+        atomoSemAtributo.put("..", "PontoDuplo");
         atomoSemAtributo.put("(", "Abre_Par");
         atomoSemAtributo.put(")", "Fecha_Par");
         atomoSemAtributo.put(";", "Ponto_Virgula");
-        atomoSemAtributo.put(",", "Virgula");
+        //   atomoSemAtributo.put(":", "Dois_Pontos");
+        atomoSemAtributo.put(",", "Dois_Pontos");
         atomoSemAtributo.put("-", "Subtrção");
         atomoSemAtributo.put("+", "Adicao");
         atomoSemAtributo.put("*", "Multiplicacao");
